@@ -2,8 +2,11 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const globals = require("./globals");
 
-const JWT_SECRET = process.env.JWT_SECRET || "temporary secret";
-const JWT_EXPIRY_TIME = process.env.JWT_EXPIRY_TIME || "28d";
+const JWT_ACCESS_SECRET = process.env.ACCESS_TOKEN_SECRET || "access secret";
+const JWT_REFRESH_SECRET = process.env.REFRESH_TOKEN_SECRET || "refresh secret";
+
+const ACCESS_EXPIRY_TIME = process.env.ACCESS_EXPIRY_TIME || "1h";
+const REFRESH_EXPIRY_TIME = process.env.REFRESH_EXPIRY_TIME || "28d";
 
 sendError = (res, err, resCode) => {
 	err = err || "Internal server error";
@@ -30,7 +33,7 @@ sendError = (res, err, resCode) => {
 	res.end();
 };
 
-sendSuccess = (res, data, resCode, token) => {
+sendSuccess = (res, data, resCode, access_token, refresh_token) => {
 	resCode = resCode || 200;
 	data = data === undefined ? {} : data;
 	let message = {
@@ -38,7 +41,9 @@ sendSuccess = (res, data, resCode, token) => {
 		status: "success",
 		data: data,
 	};
-	if (token) message["token"] = token;
+	if (access_token) message["access_token"] = access_token;
+	if (refresh_token) message["refresh_token"] = refresh_token;
+
 	res.set("X-Content-Type-Options", "nosniff");
 	res.status(resCode);
 	res.json(message);
@@ -61,10 +66,17 @@ genRandomString = (size, charset = "0123456789abcdef") => {
 	return randString;
 };
 
-genJWT = (data, secret = JWT_SECRET, expire = JWT_EXPIRY_TIME) => {
-	return jwt.sign(data, secret, {
-		expiresIn: expire,
-	});
+genJWT = (
+	data,
+	access_secret = JWT_ACCESS_SECRET,
+	access_expire = ACCESS_EXPIRY_TIME,
+	refresh_secret = JWT_REFRESH_SECRET,
+	refresh_expire = REFRESH_EXPIRY_TIME,
+) => {
+	access_token = jwt.sign(data, access_secret, { expiresIn: access_expire });
+	refresh_token = jwt.sign(data, refresh_secret, { expiresIn: refresh_expire });
+
+	return { access_token, refresh_token };
 };
 
 get_hash = passwd => {
@@ -73,17 +85,18 @@ get_hash = passwd => {
 };
 
 getJwtFromHeaders = req => {
-	auth_token = req.headers["x-mfd-token"] || "";
-	return auth_token || "";
+	access_token = req.headers["x-mfd-access-token"] || "";
+	refresh_token = req.headers["x-mfd-refresh-token"] || "";
+	return { access_token, refresh_token };
 };
 
 module.exports = {
-	getDateTime,
-	getTimeStamp,
-	genRandomString,
 	genJWT,
-	get_hash,
+	genRandomString,
+	getDateTime,
 	getJwtFromHeaders,
+	getTimeStamp,
+	get_hash,
 	sendError,
 	sendSuccess,
 };

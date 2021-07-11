@@ -24,10 +24,10 @@ morgan.token("remote-addr", function (req, res) {
 });
 
 API_BIND_ADDR = process.env.API_BIND_ADDR || "0.0.0.0";
-API_PORT = process.env.API_PORT || 5060;
+API_PORT = process.env.API_PORT || 8090;
 
 app.use("/v1/common", common_routes);
-app.use("/v1/common/user", jwtManager, user_routes);
+app.use("/v1/common/user", jwtManager("access_token"), user_routes);
 
 app.use((req, res) => {
 	throw { err_message: "Route not found!", err_code: 404 };

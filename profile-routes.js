@@ -5,14 +5,37 @@ const bcrypt = require("bcrypt");
 const models = require("./db/models");
 const funcs = require("./utils/funcs");
 
-router.patch("/info", (req, res, next) => {
-	const { email, firstname, lastname, mobile, gender, dob } = req.body;
-	const user_id = req.jwt_data.data.id;
+router.post("/info", (req, res, next) => {
+	const _id = req.jwt_data.data.id;
 
-	if (!models.mongoose.Types.ObjectId.isValid(user_id))
+	if (!models.mongoose.Types.ObjectId.isValid(_id))
 		return funcs.sendError(res, "Invalid UserID!", 403);
 
-	models.User.findOne({ _id: user_id })
+	models.User.findOne({ _id })
+		.then(user => {
+			return funcs.sendSuccess(res, {
+				_id: user._id,
+				mfd_id: user.mfd_id,
+				email: user.email,
+				dob: user.dob,
+				gender: user.gender,
+				mobile: user.mobile,
+				lastname: user.lastname,
+				firstname: user.firstname,
+				address: user.address,
+			});
+		})
+		.catch(next);
+});
+
+router.patch("/info", (req, res, next) => {
+	const { email, firstname, lastname, mobile, gender, dob } = req.body;
+	const _id = req.jwt_data.data.id;
+
+	if (!models.mongoose.Types.ObjectId.isValid(_id))
+		return funcs.sendError(res, "Invalid UserID!", 403);
+
+	models.User.findOne({ _id })
 		.then(user => {
 			if (!user) throw { err_message: "UserID not found", err_code: 404 };
 
@@ -28,12 +51,13 @@ router.patch("/info", (req, res, next) => {
 		.then(user => {
 			return funcs.sendSuccess(res, {
 				_id: user._id,
+				mfd_id: user.mfd_id,
 				email: user.email,
 				dob: user.dob,
 				gender: user.gender,
 				mobile: user.mobile,
-				lastname: user.lastname,
 				firstname: user.firstname,
+				lastname: user.lastname,
 			});
 		})
 		.catch(next);
@@ -41,10 +65,13 @@ router.patch("/info", (req, res, next) => {
 
 router.patch("/change_pswd", (req, res, next) => {
 	let { old_password, new_password } = req.body;
-	_id = req.jwt_data.data.id;
+	const _id = req.jwt_data.data.id;
 
 	if (!old_password || !new_password)
 		return funcs.sendSuccess(res, "Missing some required fields!", 406);
+
+	if (!models.mongoose.Types.ObjectId.isValid(_id))
+		return funcs.sendError(res, "Invalid UserID!", 403);
 
 	models.User.findOne({ _id })
 		.then(user => {
@@ -60,6 +87,35 @@ router.patch("/change_pswd", (req, res, next) => {
 		})
 		.then(_ => {
 			return funcs.sendSuccess(res, "Password Changed Successfully !!");
+		})
+		.catch(next);
+});
+
+router.patch("/address", (req, res, next) => {
+	let { address, district, state, pincode, is_permanant } = req.body;
+	const _id = req.jwt_data.data.id;
+
+	if (!address || !district || !state || !pincode || !is_permanant)
+		return funcs.sendSuccess(res, "Missing some required fields!", 406);
+
+	if (!models.mongoose.Types.ObjectId.isValid(_id))
+		return funcs.sendError(res, "Invalid UserID!", 403);
+
+	models.User.findOne({ _id })
+		.select({ address: 1 })
+		.then(user => {
+			if (!user) throw { err_message: "User not found", err_code: 404 };
+
+			user.address = address;
+			user.district = district;
+			user.state = state;
+			user.pincode = pincode;
+			user.is_permanant = is_permanant;
+
+			return user.save();
+		})
+		.then(_ => {
+			return funcs.sendSuccess(res, "Address Updated Successfully !!");
 		})
 		.catch(next);
 });
