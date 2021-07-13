@@ -19,7 +19,7 @@ router.post("/info", (req, res, next) => {
 				email: user.email,
 				dob: user.dob,
 				gender: user.gender,
-				mobile: user.mobile,
+				mobile_num: user.mobile_num,
 				lastname: user.lastname,
 				firstname: user.firstname,
 				address: user.address,
@@ -29,7 +29,7 @@ router.post("/info", (req, res, next) => {
 });
 
 router.patch("/info", (req, res, next) => {
-	const { email, firstname, lastname, mobile, gender, dob } = req.body;
+	const { email, firstname, lastname, mobile_num, gender, dob } = req.body;
 	const _id = req.jwt_data.data.id;
 
 	if (!models.mongoose.Types.ObjectId.isValid(_id))
@@ -42,7 +42,7 @@ router.patch("/info", (req, res, next) => {
 			if (dob) user.dob = dob;
 			if (email) user.email = email;
 			if (gender) user.gender = gender;
-			if (mobile) user.mobile = mobile;
+			if (mobile_num) user.mobile_num = mobile_num;
 			if (lastname) user.name = lastname;
 			if (firstname) user.name = firstname;
 
@@ -55,7 +55,7 @@ router.patch("/info", (req, res, next) => {
 				email: user.email,
 				dob: user.dob,
 				gender: user.gender,
-				mobile: user.mobile,
+				mobile_num: user.mobile_num,
 				firstname: user.firstname,
 				lastname: user.lastname,
 			});
@@ -95,7 +95,7 @@ router.patch("/address", (req, res, next) => {
 	let { address, district, state, pincode, is_permanant } = req.body;
 	const _id = req.jwt_data.data.id;
 
-	if (!address || !district || !state || !pincode || !is_permanant)
+	if (!address || !district || !state || !pincode || typeof is_permanant === "undefined")
 		return funcs.sendSuccess(res, "Missing some required fields!", 406);
 
 	if (!models.mongoose.Types.ObjectId.isValid(_id))
@@ -106,11 +106,13 @@ router.patch("/address", (req, res, next) => {
 		.then(user => {
 			if (!user) throw { err_message: "User not found", err_code: 404 };
 
-			user.address = address;
-			user.district = district;
-			user.state = state;
-			user.pincode = pincode;
-			user.is_permanant = is_permanant;
+			if (!user.address) user.address = {};
+
+			user.address.address = address;
+			user.address.district = district;
+			user.address.state = state;
+			user.address.pincode = pincode;
+			user.address.is_permanant = is_permanant;
 
 			return user.save();
 		})

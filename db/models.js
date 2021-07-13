@@ -18,4 +18,5 @@ mongoose
 module.exports = {
 	mongoose: mongoose,
 	User: require("./db-models/user"),
+	UserAddress: require("./db-models/user-address"),
 };

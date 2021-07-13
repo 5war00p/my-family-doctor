@@ -1,32 +1,5 @@
 const mongoose = require("mongoose");
-const _ = require("lodash");
-
-const UserAddressSchema = new mongoose.Schema({
-	address: {
-		type: String,
-		trim: true,
-		required: true,
-	},
-	district: {
-		type: String,
-		trim: true,
-		required: true,
-		set: _.capitalize,
-	},
-	state: {
-		type: String,
-		required: true,
-		set: _.capitalize,
-	},
-	pincode: {
-		type: Number,
-		required: true,
-	},
-	is_permanent: {
-		type: Boolean,
-		default: false,
-	},
-});
+const UserAddress = require("./user-address");
 
 const UserSchema = new mongoose.Schema(
 	{
@@ -58,7 +31,7 @@ const UserSchema = new mongoose.Schema(
 		dob: {
 			type: Date,
 		},
-		address: UserAddressSchema,
+		address: UserAddress.schema,
 		blood_group: {
 			type: String,
 		},
