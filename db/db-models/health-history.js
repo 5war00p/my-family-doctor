@@ -5,27 +5,6 @@ const HealthHistorySchema = new mongoose.Schema(
 		value: {
 			type: String,
 		},
-		unit: {
-			type: String,
-			enum: [
-				// Blood Glucose
-				"mmol/L",
-				// Blood Pressure
-				"mmHg",
-				// Heart Rate
-				"bpm",
-				// Height
-				"ft",
-				"cm",
-				"in",
-				//Temperatue
-				"K",
-				"°F",
-				// Weight
-				"kg",
-				"lb",
-			],
-		},
 		author: {
 			id: {
 				type: mongoose.Schema.Types.ObjectId,
@@ -33,7 +12,7 @@ const HealthHistorySchema = new mongoose.Schema(
 			name: { type: String },
 		},
 	},
-	{ timestamps: true },
+	{ timestamps: true, id: false },
 );
 
 const HealthHistory = mongoose.model("HealthHistory", HealthHistorySchema);

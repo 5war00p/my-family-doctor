@@ -9,17 +9,35 @@ const HealthProfileSchema = new mongoose.Schema(
 			enum: ["A+", "A-", "B+", "B-", "O+", "O-", "AB+", "AB-"],
 		},
 
-		blood_glucose: [HealthHistory.schema],
+		blood_glucose: {
+			history: [HealthHistory.schema],
+			unit: { type: String, default: "mmol/L" },
+		},
 
-		blood_pressure: [HealthHistory.schema],
+		blood_pressure: {
+			history: [HealthHistory.schema],
+			unit: { type: String, default: "mmHg" },
+		},
 
-		heart_rate: [HealthHistory.schema],
+		heart_rate: {
+			history: [HealthHistory.schema],
+			unit: { type: String, default: "bpm" },
+		},
 
-		height: [HealthHistory.schema],
+		height: {
+			history: [HealthHistory.schema],
+			unit: { type: String, default: "ft", enum: ["ft", "cm", "in"] },
+		},
 
-		temperature: [HealthHistory.schema],
+		temperature: {
+			history: [HealthHistory.schema],
+			unit: { type: String, default: "°F", enum: ["K", "°F"] },
+		},
 
-		weight: [HealthHistory.schema],
+		weight: {
+			history: [HealthHistory.schema],
+			unit: { type: String, default: "kg", enum: ["kg", "lb"] },
+		},
 
 		//References
 		user: {

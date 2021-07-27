@@ -39,53 +39,47 @@ router.patch("/", (req, res, next) => {
 			if (blood_group && blood_group.value) {
 				health_profile.blood_group = blood_group.value;
 			}
-			if (blood_glucose && blood_glucose.value && blood_glucose.unit) {
+			if (blood_glucose && blood_glucose.value) {
 				val = new models.HealthHistory({
 					value: blood_glucose.value,
-					unit: blood_glucose.unit,
 					author: { id: author_id, name: author_name },
 				});
-				health_profile.blood_glucose.push(val);
+				health_profile.blood_glucose.history.push(val);
 			}
-			if (blood_pressure && blood_pressure.value && blood_pressure.unit) {
+			if (blood_pressure && blood_pressure.value) {
 				val = new models.HealthHistory({
 					value: blood_pressure.value,
-					unit: blood_pressure.unit,
 					author: { id: author_id, name: author_name },
 				});
-				health_profile.blood_pressure.push(val);
+				health_profile.blood_pressure.history.push(val);
 			}
-			if (heart_rate && heart_rate.value && heart_rate.unit) {
+			if (heart_rate && heart_rate.value) {
 				val = new models.HealthHistory({
 					value: heart_rate.value,
-					unit: heart_rate.unit,
 					author: { id: author_id, name: author_name },
 				});
-				health_profile.heart_rate.push(val);
+				health_profile.heart_rate.history.push(val);
 			}
-			if (height && height.value && height.unit) {
+			if (height && height.value) {
 				val = new models.HealthHistory({
 					value: height.value,
-					unit: height.unit,
 					author: { id: author_id, name: author_name },
 				});
-				health_profile.height.push(val);
+				health_profile.height.history.push(val);
 			}
 			if (temperature && temperature.value) {
 				val = new models.HealthHistory({
 					value: temperature.value,
-					unit: temperature.unit,
 					author: { id: author_id, name: author_name },
 				});
-				health_profile.temperature.push(val);
+				health_profile.temperature.history.push(val);
 			}
-			if (weight && weight.value && weight.unit) {
+			if (weight && weight.value) {
 				val = new models.HealthHistory({
 					value: weight.value,
-					unit: weight.unit,
 					author: { id: author_id, name: author_name },
 				});
-				health_profile.weight.push(val);
+				health_profile.weight.history.push(val);
 			}
 			return health_profile.save();
 		})
