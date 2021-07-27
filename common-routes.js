@@ -25,6 +25,7 @@ router.post("/login", (req, res) => {
 					mfd_id: user.mfd_id,
 				},
 				isloggedIn: true,
+				version: process.env.VERSION,
 			};
 			const { access_token, refresh_token } = funcs.genJWT(jwt_data);
 			user.last_login = new Date();
@@ -63,6 +64,7 @@ router.post("/register", (req, res) => {
 					mfd_id: user.mfd_id,
 				},
 				isloggedIn: true,
+				version: process.env.VERSION,
 			};
 			const { access_token, refresh_token } = funcs.genJWT(jwt_data);
 			user.last_login = new Date();
@@ -96,6 +98,16 @@ router.post("/refresh_token", jwtManager("refresh_token"), (req, res, next) => {
 		.catch(next);
 });
 
-router.delete("/logout", (req, res) => {});
+router.delete("/logout", jwtManager("access_token"), (req, res, next) => {
+	const _id = req.jwt_data.data.id;
+
+	models.User.findOneAndUpdate({ _id }, { $unset: { refresh_token: 1 } })
+		.then(user => {
+			if (!user) throw { err_message: "User not exists!", err_code: 401 };
+
+			return funcs.sendSuccess(res, "Loggedout Successfully !!");
+		})
+		.catch(next);
+});
 
 module.exports = router;

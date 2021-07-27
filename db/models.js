@@ -19,4 +19,6 @@ module.exports = {
 	mongoose: mongoose,
 	User: require("./db-models/user"),
 	UserAddress: require("./db-models/user-address"),
+	HealthProfile: require("./db-models/health-profile"),
+	HealthHistory: require("./db-models/health-history"),
 };

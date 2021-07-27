@@ -32,9 +32,6 @@ const UserSchema = new mongoose.Schema(
 			type: Date,
 		},
 		address: UserAddress.schema,
-		blood_group: {
-			type: String,
-		},
 		mobile_num: {
 			type: Number,
 		},
@@ -53,6 +50,12 @@ const UserSchema = new mongoose.Schema(
 		},
 		refresh_token: {
 			type: String,
+		},
+
+		//References
+		health_profile: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "HealthProfile",
 		},
 	},
 	{

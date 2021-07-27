@@ -9,12 +9,12 @@ module.exports = type => {
 		baseUrl = req.baseUrl.split("/").reverse()[0];
 		const { access_token, refresh_token } = funcs.getJwtFromHeaders(req);
 
-		if (type === "access_token") {
-			auth_token = access_token;
-			JWT_SECRET = JWT_ACCESS_SECRET;
-		} else if (type === "refresh_token") {
+		if (type === "refresh_token") {
 			auth_token = refresh_token;
 			JWT_SECRET = JWT_REFRESH_SECRET;
+		} else if (type === "access_token") {
+			auth_token = access_token;
+			JWT_SECRET = JWT_ACCESS_SECRET;
 		}
 
 		if (!auth_token && baseUrl !== "common")
@@ -26,6 +26,10 @@ module.exports = type => {
 					throw { err_message: "Authentication token expired!", err_code: 401 };
 				throw { err_message: "Invalid authentication token!", err_code: 401 };
 			}
+
+			if (data.version !== process.env.VERSION)
+				throw { err_message: "Token Resetted!", err_code: 401 };
+
 			delete data["exp"];
 			delete data["iat"];
 			req.jwt_data = data;
