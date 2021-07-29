@@ -3,6 +3,19 @@ const router = require("express").Router();
 const models = require("./db/models");
 const funcs = require("./utils/funcs");
 
+router.post("/", (req, res, next) => {
+	const _id = req.jwt_data.data.id;
+
+	if (!models.mongoose.Types.ObjectId.isValid(_id))
+		return funcs.sendError(res, "Invalid UserID!", 403);
+
+	models.HealthProfile.findOne({ user: _id })
+		.then(health_profile => {
+			return funcs.sendSuccess(res, health_profile);
+		})
+		.catch(next);
+});
+
 router.patch("/", (req, res, next) => {
 	const {
 		user_id,
