@@ -39,16 +39,22 @@ router.patch("/", (req, res, next) => {
 
 	if (!author_id && !author_name) return funcs.sendError(res, "Author Details must sent!", 403);
 
+	var User;
 	models.User.findOne({ _id: user_id })
 		.populate({ path: "health_profile" })
 		.then(user => {
 			if (!user) throw { err_message: "UserID not found", err_code: 404 };
 
-			if (!user.health_profile) return models.HealthProfile.create({ user: user_id });
+			User = user;
+			if (!user.health_profile) {
+				return models.HealthProfile.create({ user: user_id });
+			}
 
 			return user.health_profile;
 		})
 		.then(health_profile => {
+			User.health_profile = health_profile._id;
+
 			if (blood_group && blood_group.value) {
 				health_profile.blood_group = blood_group.value;
 			}
@@ -94,10 +100,10 @@ router.patch("/", (req, res, next) => {
 				});
 				health_profile.weight.history.push(val);
 			}
-			return health_profile.save();
+			return Promise.all([health_profile.save(), User.save()]);
 		})
-		.then(health_profile => {
-			return funcs.sendSuccess(res, health_profile);
+		.then(promises => {
+			return funcs.sendSuccess(res, promises[0]);
 		})
 		.catch(next);
 });
